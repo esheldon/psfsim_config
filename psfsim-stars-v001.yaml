@@ -153,7 +153,7 @@ output:
     # os.path.expandvars() on this, so we can use environment variables
     dir:
       type: FormattedStr
-      format: "%s/%s/data"
+      format: "%s/%s/output"
       items:
         - *PSFSIM_DIR
         - *run
