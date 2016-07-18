@@ -10,6 +10,8 @@ some_variables :
     - &DESDATA /astro/u/astrodat/data/DES
     - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
 
+run: *run
+
 modules:
     - galsim.des
 
@@ -109,8 +111,8 @@ image:
     sky_level: 18000     # ADU / arcsec^2.  TODO: match to DES
     noise:
         type: CCD        # CCD noise includes both read noise and poisson noise
-        gain: 2.1        # e- / ADU  TODO: match to DES
-        read_noise: 3.4  # Variance in ADU^2  TODO: match to DES
+        gain: 4.0        # e- / ADU not atypical for DES
+        read_noise: 6.0  # Variance in ADU^2  not atypical for DES
 
     wcs :
         type : DES_Local  # Defined in des_wcs.py in this directory.
@@ -163,4 +165,5 @@ output:
         - *run
         - { type: Sequence, nitems: '@output.nfiles' }
 
-    nproc: -1            # -1 here means to use the number of CPUs.
+    # -1 here means to use the number of CPUs.
+    nproc: 1
