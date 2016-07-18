@@ -4,8 +4,11 @@
 # into the same directory and the only string I know how to grab is @root,
 # which would be different for the two configs
 
+# TODO instead get DESDATA PSFSIM_DIR from environment variables
 some_variables :
     - &run v001
+    - &DESDATA /astro/u/astrodat/data/DES
+    - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
 
 modules:
     - galsim.des
@@ -130,24 +133,27 @@ input:
         # and get a local WCS at some (in this case random) image position.
         # This choice is a random Y1 field in the SPTE region.
 
-        # TODO: this won't work on another system; send pull request to run
-        # os.path.expandvars() on this, so we can use environment variables
-        # such as
+        # TODO: this won't work on another system because we hard coded DESDATA
+        # above; send pull request to run os.path.expandvars() on this, so we
+        # can use environment variables such as
         # dir : "$DESDATA/OPS/red/20140715085838_20131201/red/DECam_00259397"
-        dir : "/astro/u/astrodat/data/DES/OPS/red/20140715085838_20131201/red/DECam_00259397"
+        dir:
+            type: FormattedStr
+            format: "%s/OPS/red/20140715085838_20131201/red/DECam_00259397"
+            items:
+                - *DESDATA
         root : "DECam_00259397"
 
 output:
     nfiles: 62
 
-    # hard-wiring run, since we have two different config writing into
-    # the same directory
     # TODO: this won't work on another system; send pull request to run
     # os.path.expandvars() on this, so we can use environment variables
     dir:
       type: FormattedStr
-      format: "/gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim/%s/data"
+      format: "%s/%s/data"
       items:
+        - *PSFSIM_DIR
         - *run
 
     file_name:
