@@ -1,0 +1,243 @@
+# currently has hard wired paths, since we have two different configs writing
+# into the same directory and the only string I know how to grab is @root,
+# which would be different for the two configs
+
+modules:
+
+    # Use the extra features from the galsim.des module
+    - galsim.des
+
+    # A custom package in this directory for measuring shapes with HSM
+    - hsm_shape
+
+    # Read the WCS from a (in this case random) location within a real DES focal place observation.
+    - des_wcs
+
+psf:
+    type: Convolve
+
+    # This means the psf should change per output file, not per object as would be the default.
+    index_key : file_num
+
+    items:
+    # The atmospheric component
+    -   type: Kolmogorov
+        # To avoid PSFs that were "too round", the ellipticity was drawn from a uniform
+        # distribution from sqrt(1.e-4) to sqrt(9.e-4), based on an estimate of the
+        # typical variance of e in ground-based imaging.
+        ellip:
+            type: EBeta
+            e:
+                type: Random
+                min: 0.01
+                max: 0.03
+            beta:
+                type: Random
+
+        # The seeing is taken from a plausible distribution of seeing values
+        # ranging from 0.6 to 1.1.
+        fwhm:
+            type: RandomDistribution
+            x: [ 0.6, 0.7, 0.8, 0.9, 1.0, 1.1 ]
+            f: [  0., 10., 20., 40., 30.,  0. ]
+
+    # The optical component
+    -   type: OpticalPSF
+        # Take lambda = 800 nm.  D = 4 m.  lam/D = 0.04 arcsec
+        lam_over_diam: "$800 * 1.e-9 / 4 * 206265"
+
+        # I don't know what the right value of this is.  This is a guess.
+        obscuration: 0.3
+
+        # DECam has 4 struts.  Not sure what strut_thick or strut_angle is appropriate here.
+        # So these are just guesses.
+        nstruts: 4
+        strut_thick: 0.05  # In units of pupil diameter.
+        strut_angle: 10 degrees
+
+        # According to Aaron Roodma, for DES the appropriate rms values are
+        # [ 0.13, 0.13, 0.14, 0.06, 0.06, 0.05, 0.06, 0.03 ]
+        defocus: { type: RandomGaussian, sigma: 0.13 }
+        astig1: { type: RandomGaussian, sigma: 0.13 }
+        astig2: { type: RandomGaussian, sigma: 0.14 }
+        coma1: { type: RandomGaussian, sigma: 0.06 }
+        coma2: { type: RandomGaussian, sigma: 0.06 }
+        trefoil1: { type: RandomGaussian, sigma: 0.05 }
+        trefoil2: { type: RandomGaussian, sigma: 0.06 }
+        spher: { type: RandomGaussian, sigma: 0.03 }
+
+        # Sometimes the OpticalPSF wants to make a very large image of the PSF.  But if the
+        # PSF image is larger than the postage stamp onto which we will draw the object,
+        # the larger area is mostly wasted.  Setting max_size to the size of the postage stamp
+        # we will eventually draw onto helps avoid wasted calculations.
+        # This is in arcsec, so max_size = stamp_size * pixel_scale
+        # We're using a non-square wcs, so there isn't a well-defined pixel scale.  Use
+        # the maxLinearScale to get the maximum "pixel scale" for the parallelogram.
+        max_size: "$@image.size * wcs.maxLinearScale()"
+        suppress_warning: true
+
+gal:
+    type: Exponential
+    half_light_radius:
+        type : Random
+        min: 0.5
+        max: 2.0
+    flux:
+        type: Random
+        min: 1000
+        max: 5000
+
+    shear:
+        index_key: file_num
+        type: G1G2
+        g1:
+            type: Random
+            min: 0.0
+            max: 0.05
+        g2:
+            type: Random
+            min: -0.03
+            max: 0.02
+
+    ellip:
+
+        type: EtaBeta
+        eta:
+            type: RandomGaussian
+            sigma: 1.0
+            min: 0
+        beta:
+            type: Random
+
+        #type: GBeta
+        #g:
+        #    #from Bernstein & Armstrong 2014
+        #    # this didn't work, due to np.exp
+        #    type: RandomDistribution
+        #    #function: "(1-x**2)**2 * np.exp( -0.5 * x**2 / 0.2**2 )"
+        #    function: "(1-x**2)**2"
+        #    x_min: 0.0
+        #    x_max: 1.0
+        #beta:
+        #    type: Random
+
+stamp:
+    # We're not drawing on a normal image, so we need to mock up an image_pos for the wcs to use.
+    image_pos:
+        type: XY
+        x: { type: Random, min: 0, max: 2048 }
+        y: { type: Random, min: 0, max: 2048 }
+
+
+image:
+    # Eventually, it would be nice to have variable stamp sizes based on the galaxy size, but
+    # don't bother with that for now.
+    size: 48
+
+    # Use a real wcs from some random location within a DES focal plane.
+    wcs :
+        type : DES_Local  # Defined in des_wcs.py in this directory.
+
+        # We could specify a chipnum here if we wanted.  The default is to pick a random chipnum
+        # from 1-62
+
+        # This also optionally takes image_pos, but we'll use the default here, which is to pick
+        # a random location on the chip.
+
+    random_seed: 23721
+
+    noise:
+        type: Gaussian
+        variance:
+            type: Random
+            min: 0.002
+            max: 0.006
+
+    # Offset is just random within central pixel.
+    offset:
+        type: XY
+        x: { type: Random, min: -0.5, max: 0.5 }
+        y: { type: Random, min: -0.5, max: 0.5 }
+
+    # This means the code will parallelize the creation of a single output file,
+    # splitting up the postage stamps among the available cores.
+    # This is normally overridden by the output.nproc item below, so the parellelization
+    # will be done over files instead.  But if you modify this to only do one file or
+    # set output.nproc=1, then this stamp-based parallelization will turn on.
+    # However, we aren't using that here.
+    #nproc: -1
+
+    # Great3 found that some stamps needed a larger fft size than default.  I don't think it's
+    # necessary here, but it doesn't hurt to put this in.
+    gsparams: {maximum_fft_size: 10240}
+
+input:
+
+    des_wcs:
+        # This is used by the DES_Local wcs type.
+        # It reads in a full field worth of WCS objects, which DES_Local will select from
+        # and get a local WCS at some (in this case random) image position.
+        # This choice is a random Y1 field in the SPTE region.
+        dir : "/astro/u/astrodat/data/DES/OPS/red/20140715085838_20131201/red/DECam_00259397"
+        root : "DECam_00259397"
+
+output:
+    type: MEDS
+    nobjects: 10000  # nobj per file
+    nstamps_per_object: 1  # For now, single epoch sim.
+
+    # hard-wiring run, since we have two different config files writing into
+    # the same directory
+    dir: "/gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim/psfsim-v001/data"
+
+    file_name:
+        type: FormattedStr
+        format: "psfsim-gals-v001-%04d.fits"
+        items:
+        - { type: Sequence, nitems: '@output.nfiles' }
+
+    # Note: This can be changed from the command line as `galsim meds.yaml output.nfiles=10` say.
+    # Likewise for any other parameters in the configuration.  This is often more convenient than
+    # changing the original YAML configuration file.  Especially for temporary modifications.
+    nfiles: 200
+
+    # This means the code will parallelize across the different files, doing a full
+    # output file in each core at a time.
+    # This is generally better than image.nproc, since it doesn't require as much interprocess
+    # communication, which can be rather slow.
+    # However, we'll just let the queue do the work of parallelizing in this case.  I will
+    # submit jobs that each do a single file.  
+    # Note: once we start using RealGalaxies, it will probably be more efficient to use -1 here.
+
+    # testing on astro0033, leaving one core free	
+    nproc: 7
+
+    # Output truth catalogs with some of the generated values
+    truth:
+        file_name :
+            type: FormattedStr
+            format: "%s-truth-%04d.fits"
+            items:
+            - '@root'
+            - { type: Sequence, nitems: '@output.nfiles' }
+        columns:
+
+            num: obj_num
+            x: stamp.image_pos.x
+            y: stamp.image_pos.y
+
+            g1: gal.shear.g1
+            g2: gal.shear.g2
+            gal_hlr: gal.half_light_radius
+            gal_flux: gal.flux
+
+            psf_hlr: "$(@psf).calculateHLR()"
+            # Use hsm to get PSF shape estimates
+            psf_e1:
+                type: Eval
+                str: "psfe.e1"
+                gpsfe :
+                    index_key: file_num  # Only remeasure for each new file num.
+                    type: HSM_Shape_Measure  # Defined in hsm_shape.py in this directory.
+                    obj: 'psf'
+            psf_e2: "$(@output.truth.columns.psf_e1.gpsfe).e2"
