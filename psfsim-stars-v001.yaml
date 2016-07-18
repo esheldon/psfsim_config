@@ -4,11 +4,14 @@
 # into the same directory and the only string I know how to grab is @root,
 # which would be different for the two configs
 
+some_variables :
+    - &run v001
+
 modules:
     - galsim.des
 
     # Read the WCS from a (in this case random) location within a real DES focal place observation.
-    - des_wcs
+    - galsim_extra.des_wcs
 
 psf:
     type: Convolve
@@ -134,7 +137,6 @@ input:
         dir : "/astro/u/astrodat/data/DES/OPS/red/20140715085838_20131201/red/DECam_00259397"
         root : "DECam_00259397"
 
-
 output:
     nfiles: 62
 
@@ -142,13 +144,17 @@ output:
     # the same directory
     # TODO: this won't work on another system; send pull request to run
     # os.path.expandvars() on this, so we can use environment variables
-    dir: "/gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim/psfsim-v001/data"
+    dir:
+      type: FormattedStr
+      format: "/gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim/%s/data"
+      items:
+        - *run
+
     file_name:
         type: FormattedStr
-        format: "psfsim-stars-v001-%04d.fits"
+        format: "psfsim-stars-%s-%04d.fits"
         items:
+        - *run
         - { type: Sequence, nitems: '@output.nfiles' }
 
-    # testing on astro0033, leaving one core free	
-    nproc: 7
-    #nproc: -1            # -1 here means to use the number of CPUs.
+    nproc: -1            # -1 here means to use the number of CPUs.
