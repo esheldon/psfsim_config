@@ -98,25 +98,15 @@ gal:
 
     ellip:
 
-        type: EtaBeta
-        eta:
-            type: RandomGaussian
-            sigma: 1.0
-            min: 0
+        type: GBeta
+        g:
+            #from Bernstein & Armstrong 2014
+            type: RandomDistribution
+            function: "(1-x**2)**2 * math.exp( -0.5 * x**2 / 0.2**2 )"
+            x_min: 0.0
+            x_max: 1.0
         beta:
             type: Random
-
-        #type: GBeta
-        #g:
-        #    #from Bernstein & Armstrong 2014
-        #    # this didn't work, due to np.exp
-        #    type: RandomDistribution
-        #    #function: "(1-x**2)**2 * np.exp( -0.5 * x**2 / 0.2**2 )"
-        #    function: "(1-x**2)**2"
-        #    x_min: 0.0
-        #    x_max: 1.0
-        #beta:
-        #    type: Random
 
 stamp:
     # We're not drawing on a normal image, so we need to mock up an image_pos for the wcs to use.
