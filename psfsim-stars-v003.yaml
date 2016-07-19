@@ -1,6 +1,7 @@
 # vim: set sw=4 :
 # Basic features:
 # - optical model based on DES; variation across each image
+#    - sigmas factor of 10 lower than v002
 # - Kolmogorov atmosphere, different for each image
 # - Stars only; gaussians with very small sigma, ~ delta functions
 # - image parameters that are not atypical for DES
