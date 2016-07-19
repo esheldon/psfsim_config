@@ -1,8 +1,10 @@
-# copied from a config to generate a semi-realistic set of images of the
-# complete LSST focal plane
-# currently has hard wired paths, since we have two different configs writing
-# into the same directory and the only string I know how to grab is @root,
-# which would be different for the two configs
+# vim: set sw=4 :
+# Basic features:
+# - optical model based on DES; no variation across a CCD or focal plane
+# - Kolmogorov atmosphere, different for each image
+# - Stars only; gaussians with very small sigma, ~ delta functions
+# - image parameters that are not atypical for DES
+# - wcs drawn from an example DES exposure
 
 # TODO instead get DESDATA PSFSIM_DIR from environment variables
 some_variables :

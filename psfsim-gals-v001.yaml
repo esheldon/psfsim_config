@@ -1,7 +1,4 @@
-# currently has hard wired paths, since we have two different configs writing
-# into the same directory and the only string I know how to grab is @root,
-# which would be different for the two configs
-
+# vim: set sw=4 :
 modules:
 
     # Use the extra features from the galsim.des module
