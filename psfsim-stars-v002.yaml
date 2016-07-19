@@ -1,0 +1,245 @@
+# vim: set sw=4 :
+# Basic features:
+# - optical model based on DES; variation across each image
+# - Kolmogorov atmosphere, different for each image
+# - Stars only; gaussians with very small sigma, ~ delta functions
+# - image parameters that are not atypical for DES
+# - wcs drawn from an example DES exposure
+
+# TODO instead get DESDATA PSFSIM_DIR from environment variables
+some_variables :
+    - &run v002
+    - &DESDATA /astro/u/astrodat/data/DES
+    - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
+
+run: *run
+
+modules:
+    - galsim.des
+
+    # Read the WCS from a (in this case random) location within a real DES focal place observation.
+    - galsim_extra.des_wcs
+
+psf:
+    type: Convolve
+
+    # This means the psf should change per output file, not per object as would be the default.
+    index_key: file_num
+
+    items:
+    # The atmospheric component
+    -   type: Kolmogorov
+        # To avoid PSFs that were "too round", the ellipticity was drawn from a uniform
+        # distribution from sqrt(1.e-4) to sqrt(9.e-4), based on an estimate of the
+        # typical variance of e in ground-based imaging.
+        ellip:
+            type: EBeta
+            e:
+                type: Random
+                min: 0.01
+                max: 0.03
+            beta:
+                type: Random
+
+        # The seeing is taken from a plausible distribution of seeing values
+        # ranging from 0.6 to 1.1.
+        fwhm:
+            type: RandomDistribution
+            x: [ 0.6, 0.7, 0.8, 0.9, 1.0, 1.1 ]
+            f: [  0., 10., 20., 40., 30.,  0. ]
+
+    # The optical component
+    -   type: OpticalPSF
+        # Take lambda = 800 nm.  D = 4 m.  lam/D = 0.04 arcsec
+        lam_over_diam: "$800 * 1.e-9 / 4 * 206265"
+
+        # I don't know what the right value of this is.  This is a guess.
+        obscuration: 0.3
+
+        # DECam has 4 struts.  Not sure what strut_thick or strut_angle is appropriate here.
+        # So these are just guesses.
+        nstruts: 4
+        strut_thick: 0.05  # In units of pupil diameter.
+        strut_angle: 10 degrees
+
+        # According to Aaron Roodman, for DES the appropriate rms values are
+        # [ 0.13, 0.13, 0.14, 0.06, 0.06, 0.05, 0.06, 0.03 ]
+        defocus: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.13, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+
+        astig1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.13, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+
+        astig2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.14, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 2.e-3, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.e-6, index_key: file_num }
+
+        coma1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+
+        coma2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+
+        trefoil1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.05, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 7.69e-4, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 7.69e-4, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 3.85e-7, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 3.85e-7, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 3.85e-7, index_key: file_num }
+
+
+        trefoil2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 9.23e-4, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 4.62e-7, index_key: file_num }
+
+        spher: { type: RandomGaussian, sigma: 0.03 }
+        spher: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.03, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 4.62e-4, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 4.62e-4, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 2.31e-7, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 2.31e-7, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 2.31e-7, index_key: file_num }
+
+
+        # Sometimes the OpticalPSF wants to make a very large image of the PSF.  But if the
+        # PSF image is larger than the postage stamp onto which we will draw the object,
+        # the larger area is mostly wasted.  Setting max_size to the size of the postage stamp
+        # we will eventually draw onto helps avoid wasted calculations.
+        # This is in arcsec, so max_size = stamp_size * pixel_scale
+        # We're using a non-square wcs, so there isn't a well-defined pixel scale.  Use
+        # the maxLinearScale to get the maximum "pixel scale" for the parallelogram.
+        max_size: "$@image.xsize * wcs.maxLinearScale()"
+        suppress_warning: true
+
+
+gal: 
+    # delta function -> stars
+    type: Gaussian
+    sigma: 1.e-4
+    flux:  # Let the star fluxes range larger than the galaxy fluxes
+        type: RandomDistribution
+        function: x**-2.5
+        x_min: 1.e1
+        x_max: 1.e8
+    gsparams:
+        folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
+                                   # that are apparent for the brightest stars.
+    gsparams: 
+        # Some of these objects are a bit large, so allow for larger FFT images.
+        maximum_fft_size: 10000
+
+# TODO: need to tune this more for des images
+image:
+    # The "Scattered" type means the objects can be anywhere in the image, even 
+    # overlapping. You can place them at specific locations if you want, but here,
+    # we use the default, which is random locations.
+    type: Scattered
+    #pixel_scale: 0.263   # DES Pixel scale in arcsec/pixel
+    xsize: 2048          # DES ccds have 2048 columns
+    ysize: 4096          # DES ccds have 4096 rows
+    nobjects: 2000       # TODO: Make random and match to DES density
+    sky_level: 18000     # ADU / arcsec^2.  TODO: match to DES
+    noise:
+        type: CCD        # CCD noise includes both read noise and poisson noise
+        gain: 4.0        # e- / ADU not atypical for DES
+        read_noise: 6.0  # Variance in ADU^2  not atypical for DES
+
+    wcs :
+        type : DES_Local  # Defined in des_wcs.py in this directory.
+
+        # We could specify a chipnum here if we wanted.  The default is to pick a random chipnum
+        # from 1-62
+
+        # This also optionally takes image_pos, but we'll use the default here, which is to pick
+        # a random location on the chip.
+
+
+
+    random_seed: 4853    # A specific seed, so results are repeatable. (optional)
+
+input:
+
+    des_wcs:
+        # This is used by the DES_Local wcs type.
+        # It reads in a full field worth of WCS objects, which DES_Local will select from
+        # and get a local WCS at some (in this case random) image position.
+        # This choice is a random Y1 field in the SPTE region.
+
+        # TODO: this won't work on another system because we hard coded DESDATA
+        # above; send pull request to run os.path.expandvars() on this, so we
+        # can use environment variables such as
+        # dir : "$DESDATA/OPS/red/20140715085838_20131201/red/DECam_00259397"
+        dir:
+            type: FormattedStr
+            format: "%s/OPS/red/20140715085838_20131201/red/DECam_00259397"
+            items:
+                - *DESDATA
+        root : "DECam_00259397"
+
+output:
+    nfiles: 62
+
+    # TODO: this won't work on another system; send pull request to run
+    # os.path.expandvars() on this, so we can use environment variables
+    dir:
+      type: FormattedStr
+      format: "%s/%s/output"
+      items:
+        - *PSFSIM_DIR
+        - *run
+
+    file_name:
+        type: FormattedStr
+        format: "psfsim-stars-%s-%04d.fits"
+        items:
+        - *run
+        - { type: Sequence, nitems: '@output.nfiles' }
+
+    # -1 here means to use the number of CPUs.
+    nproc: 1
