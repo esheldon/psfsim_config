@@ -157,11 +157,20 @@ gal:
     # delta function -> stars
     type: Gaussian
     sigma: 1.e-4
-    flux:  # Let the star fluxes range larger than the galaxy fluxes
+    flux:
+        # this produces way too many bright stars
+
         type: RandomDistribution
-        function: x**-2.5
-        x_min: 1.e1
-        x_max: 1.e8
+
+        # looks like the slope for the bright end stars in DES r band
+        function: x**-0.5
+
+        # I got ~370 in this range of fluxes
+        x_min: 6300.0
+        x_max: 1.0e+06
+        # divided by gain
+        #x_min: 1575.0
+        #x_max: 2.5e+05
     gsparams:
         folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
                                    # that are apparent for the brightest stars.
@@ -181,7 +190,9 @@ image:
     type: Scattered
     xsize: 2048          # DES ccds have 2048 columns
     ysize: 4096          # DES ccds have 4096 rows
-    nobjects: 2000       # TODO: Make random and match to DES density
+    nobjects:
+        type: RandomPoisson
+        mean: 370
 
     sky_level: 3330.0    # ADU / arcsec^2. 231 in ADU/pixel
 
