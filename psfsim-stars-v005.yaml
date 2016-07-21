@@ -13,7 +13,7 @@
 # - DESDATA PSFSIM_DIR from environment variables
 
 some_variables :
-    - &run v004
+    - &run v005
     - &DESDATA /astro/u/astrodat/data/DES
     - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
 
