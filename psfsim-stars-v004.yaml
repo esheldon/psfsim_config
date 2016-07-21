@@ -163,7 +163,7 @@ gal:
         type: RandomDistribution
 
         # looks like the slope for the bright end stars in DES r band
-        function: x**-0.5
+        function: x**-1.5
 
         # I got ~370 in this range of fluxes
         x_min: 6300.0
