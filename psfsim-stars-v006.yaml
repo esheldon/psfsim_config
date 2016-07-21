@@ -1,8 +1,4 @@
 # vim: set sw=4 :
-# same as v004/v005 but bug fixes
-# - just set flux and gsparams on psf, no gal needed for a star field
-# - calculate hlr of psf, not gal (which is pre-psf)
-# - bug setting gsparams
 # see notes.txt for a summary of the features
 
 # TODO - send pull request so galsim can get DESDATA PSFSIM_DIR from

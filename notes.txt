@@ -14,3 +14,9 @@ v004:
 
 v005
     - same as v004 but with more output images
+
+v006
+    - same as v005 but bug fixes
+        - calculate hlr of psf, not gal (which is pre-psf)
+        - bug setting gsparams
+        - just set flux and gsparams on psf, no gal needed for a star field
