@@ -1,0 +1,16 @@
+Summary info for each run
+
+v004:
+    - stars only (very small galaxies)
+    - 62 images
+    - DES optical psf with spatial variation, independent in each image
+    - Kolmogorov atmosphere with fwhm drawn from log normal, random shape
+      uniform in 0.01 0.03
+    - flux distribution roughly matches r-band data at the bright end.
+    - number of stars roughly matches typical r band
+    - wcs drawn from a DES exposure
+    - extrapolated to the faint end
+    - noise properties matched to r band exposure, a random CCD
+
+v005
+    - same as v004 but with more output images
