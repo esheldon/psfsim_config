@@ -256,3 +256,22 @@ output:
 
     # -1 here means to use the number of CPUs.
     nproc: 1
+
+    # Output truth catalogs with some of the generated values
+    truth:
+        file_name :
+            type: FormattedStr
+            format: "psfsim-stars-truth-%s-%04d.fits"
+            items:
+                - *run
+                - { type: Sequence, nitems: '@output.nfiles' }
+        columns:
+
+            num: obj_num
+            x: image.image_pos.x
+            y: image.image_pos.y
+
+            flux: gal.flux
+
+            hlr: "$(@gal).calculateHLR()"
+
