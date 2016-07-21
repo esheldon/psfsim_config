@@ -61,24 +61,6 @@ psf:
         strut_thick: 0.05  # In units of pupil diameter.
         strut_angle: 10 degrees
 
-        # we are not setting a gal configuration, so we can set fluxes here
-        flux:
-            # this produces way too many bright stars
-
-            type: RandomDistribution
-
-            # looks like the slope for the bright end stars in DES r band
-            function: x**-1.5
-
-            # I got ~370 in this range of fluxes
-            x_min: 6300.0
-            x_max: 1.0e+06
-        gsparams:
-            folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
-                                       # that are apparent for the brightest stars.
-            # Some of these objects are a bit large, so allow for larger FFT images.
-            maximum_fft_size: 10000
-
 
         # According to Aaron Roodman, for DES the appropriate rms values are
         # [ 0.13, 0.13, 0.14, 0.06, 0.06, 0.05, 0.06, 0.03 ]
@@ -164,6 +146,32 @@ psf:
             fc: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
             fd: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
             fe: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
+
+
+gal: 
+    # delta function -> stars
+    type: Gaussian
+    sigma: 1.e-4
+
+    # we are not setting a gal configuration, so we can set fluxes here
+    flux:
+        # this produces way too many bright stars
+
+        type: RandomDistribution
+
+        # looks like the slope for the bright end stars in DES r band
+        function: x**-1.5
+
+        # I got ~370 in this range of fluxes
+        x_min: 6300.0
+        x_max: 1.0e+06
+
+    gsparams:
+        folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
+                                   # that are apparent for the brightest stars.
+        # Some of these objects are a bit large, so allow for larger FFT images.
+        maximum_fft_size: 10000
+
 
 # TODO: need to tune this more for des images
 image:
@@ -252,6 +260,6 @@ output:
             x: image.image_pos.x
             y: image.image_pos.y
 
-            flux: gal.flux
+            flux: psf.flux
             hlr: "$(@psf).calculateHLR()"
 
