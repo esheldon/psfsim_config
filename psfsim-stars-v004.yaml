@@ -249,7 +249,7 @@ output:
 
     file_name:
         type: FormattedStr
-        format: "psfsim-stars-%s-%04d.fits"
+        format: "psfsim-stars-%s-%06d.fits"
         items:
         - *run
         - { type: Sequence, nitems: '@output.nfiles' }
@@ -261,7 +261,7 @@ output:
     truth:
         file_name :
             type: FormattedStr
-            format: "psfsim-stars-truth-%s-%04d.fits"
+            format: "psfsim-stars-truth-%s-%06d.fits"
             items:
                 - *run
                 - { type: Sequence, nitems: '@output.nfiles' }
