@@ -1,5 +1,14 @@
 Summary info for each run
 
+v006
+    - same as v005 but bug fixes
+        - calculate hlr of psf, not gal (which is pre-psf)
+        - bug setting gsparams. Had two entries for
+          gaparams, and thus was not not setting folding_threshold
+
+v005
+    - same as v004 but with more output images
+
 v004:
     - stars only (very small galaxies)
     - 62 images
@@ -12,11 +21,4 @@ v004:
     - extrapolated to the faint end
     - noise properties matched to r band exposure, a random CCD
 
-v005
-    - same as v004 but with more output images
 
-v006
-    - same as v005 but bug fixes
-        - calculate hlr of psf, not gal (which is pre-psf)
-        - bug setting gsparams
-        - just set flux and gsparams on psf, no gal needed for a star field
