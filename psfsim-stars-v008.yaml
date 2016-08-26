@@ -92,74 +92,74 @@ psf:
         defocus: 
             type: Eval
             str: "mean_4 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_4/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_4/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_4/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_4/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_4/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_4/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_4/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_4/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_4/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_4/2048./4096., index_key: file_num }
 
         astig1: 
             type: Eval
             str: "mean_5 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_5/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_5/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_5/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_5/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_5/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_5/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_5/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_5/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_5/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_5/2048./4096., index_key: file_num }
 
         astig2: 
             type: Eval
             str: "mean_6 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_6/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_6/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_6/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_6/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_6/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_6/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_6/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_6/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_6/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_6/2048./4096., index_key: file_num }
 
         coma1: 
             type: Eval
             str: "mean_7 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_7/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_7/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_7/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_7/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_7/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_7/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_7/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_7/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_7/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_7/2048./4096., index_key: file_num }
 
         coma2: 
             type: Eval
             str: "mean_8 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_8/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_8/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_8/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_8/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_8/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_8/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_8/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_8/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_8/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_8/2048./4096., index_key: file_num }
 
         trefoil1: 
             type: Eval
             str: "mean_9 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_9/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_9/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_9/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_9/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_9/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_9/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_9/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_9/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_9/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_9/2048./4096., index_key: file_num }
 
         trefoil2: 
             type: Eval
             str: "mean_10 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_10/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_10/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_10/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_10/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_10/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_10/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_10/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_10/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_10/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_10/2048./4096., index_key: file_num }
 
         spher: 
             type: Eval
             str: "mean_11 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
-            fa: { type: RandomGaussian, sigma: spread_11/2048., index_key: file_num }
-            fb: { type: RandomGaussian, sigma: spread_11/4096., index_key: file_num }
-            fc: { type: RandomGaussian, sigma: spread_11/2048**2, index_key: file_num }
-            fd: { type: RandomGaussian, sigma: spread_11/2048/4096, index_key: file_num }
-            fe: { type: RandomGaussian, sigma: spread_11/4096**2, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: $spread_11/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_11/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_11/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_11/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_11/2048./4096., index_key: file_num }
 
 gal: 
     # delta function -> stars
