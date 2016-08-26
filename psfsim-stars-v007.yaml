@@ -1,0 +1,262 @@
+# vim: set sw=4 :
+# see notes.txt for a summary of the features
+
+# TODO - send pull request so galsim can get DESDATA PSFSIM_DIR from
+# environment variables
+
+some_variables :
+    - &run v007
+    - &DESDATA /astro/u/astrodat/data/DES
+    - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
+
+run: *run
+
+modules:
+    - galsim.des
+
+    # log normal distribution function
+    - galsim_extra.log_normal
+
+    # generate random integers, excluding some
+    # exports ExcludedRandom
+    - galsim_extra.excluded_random
+
+psf:
+    type: Convolve
+
+    # This means the psf should change per output file, not per object as would be the default.
+    index_key: file_num
+
+    items:
+    # The atmospheric component
+    -   type: Kolmogorov
+        # To avoid PSFs that were "too round", the ellipticity was drawn from a uniform
+        # distribution from sqrt(1.e-4) to sqrt(9.e-4), based on an estimate of the
+        # typical variance of e in ground-based imaging.
+        ellip:
+            type: EBeta
+            e:
+                type: Random
+                min: 0.01
+                max: 0.03
+            beta:
+                type: Random
+
+        # atmosphereic fwhm
+        fwhm:
+            type: LogNormal
+            mean: 0.8
+            sigma: 0.1
+
+    # The optical component
+    -   type: OpticalPSF
+        # Take lambda = 800 nm.  D = 4 m.  lam/D = 0.04 arcsec
+        lam_over_diam: "$800 * 1.e-9 / 4 * 206265"
+
+        # I don't know what the right value of this is.  This is a guess.
+        obscuration: 0.3
+
+        # DECam has 4 struts.  Not sure what strut_thick or strut_angle is appropriate here.
+        # So these are just guesses.
+        nstruts: 4
+        strut_thick: 0.05  # In units of pupil diameter.
+        strut_angle: 10 degrees
+
+
+        # According to Aaron Roodman, for DES the appropriate rms values are
+        # [ 0.13, 0.13, 0.14, 0.06, 0.06, 0.05, 0.06, 0.03 ]
+        # the linear parameter sigma are set to 0.5*(rms mean/4096) and the
+        # quadrataic to 0.5*(rms mean/4096)**2
+        defocus: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.13, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 1.6e-5, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 1.6e-5, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+
+        astig1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.13, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 1.6e-5, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 1.6e-5, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 5.0e-10, index_key: file_num }
+
+        astig2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.14, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 1.7e-5, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 1.7e-5, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 5.8e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 5.8e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 5.8e-10, index_key: file_num }
+
+        coma1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+
+        coma2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+
+        trefoil1: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.05, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 6.1e-6, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 6.1e-6, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 7.5e-11, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 7.5e-11, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 7.5e-11, index_key: file_num }
+
+        trefoil2: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.06, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 7.3e-6, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 1.1e-10, index_key: file_num }
+
+        spher: { type: RandomGaussian, sigma: 0.03 }
+        spher: 
+            type: Eval
+            str: "mean + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fmean: { type: RandomGaussian, sigma: 0.03, index_key: file_num }
+            fa: { type: RandomGaussian, sigma: 3.7e-6, index_key: file_num }
+            fb: { type: RandomGaussian, sigma: 3.7e-6, index_key: file_num }
+            fc: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: 2.7e-11, index_key: file_num }
+
+
+gal: 
+    # delta function -> stars
+    type: Gaussian
+    sigma: 1.e-4
+
+    # we are not setting a gal configuration, so we can set fluxes here
+    flux:
+        # this produces way too many bright stars
+
+        type: RandomDistribution
+
+        # looks like the slope for the bright end stars in DES r band
+        function: x**-1.5
+
+        # I got ~370 in this range of fluxes
+        x_min: 6300.0
+        x_max: 1.0e+06
+
+    gsparams:
+        folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
+                                   # that are apparent for the brightest stars.
+        # Some of these objects are a bit large, so allow for larger FFT images.
+        maximum_fft_size: 10000
+
+
+# TODO: need to tune this more for des images
+image:
+    # The "Scattered" type means the objects can be anywhere in the image, even 
+    # overlapping. You can place them at specific locations if you want, but here,
+    # we use the default, which is random locations.
+
+    # parameters from 90 second r-band image
+    # $DESDATA/OPS/red/20140807103234_20131228/red/DECam_00269284/DECam_00269284_42.fits.fz
+
+    type: Scattered
+    xsize: 2048          # DES ccds have 2048 columns
+    ysize: 4096          # DES ccds have 4096 rows
+    nobjects:
+        type: RandomPoisson
+        mean: 370
+
+    sky_level: 3330.0    # ADU / arcsec^2. 231 in ADU/pixel
+
+    # in GalSim land, noise means variance not standard deviation
+    noise:
+        type: CCD        # CCD noise includes both read noise and poisson noise
+        gain: 4.0        # e- / ADU
+        read_noise: 6.8  # Variance in ADU^2 (10.427 sigma in electrons)
+
+    wcs :
+        type : Fits
+        dir:
+            type: FormattedStr
+            format: "%s/OPS/red/20140715085838_20131201/red/DECam_00259397"
+            items:
+                - *DESDATA
+        file_name:
+            type : NumberedFile
+            root : 'DECam_00259397_'
+            digits : 2
+            ext : '.fits.fz'
+            num :
+                # Pick a random chip, but not either of our bad chips.
+                type : ExcludedRandom  # This is a custom type defined in exclude_random.py
+                min: 1
+                max : 62
+                exclude: [ 2, 31, 61 ]
+
+
+    # A specific seed, so results are repeatable. (optional)
+    # over-ride with galsim config.yaml image.random_seed=something
+
+    random_seed: 8969
+
+output:
+    nfiles: 20000
+
+    dir:
+      type: FormattedStr
+      format: "%s/%s/output"
+      items:
+        - *PSFSIM_DIR
+        - *run
+
+    file_name:
+        type: FormattedStr
+        format: "psfsim-stars-%s-%06d.fits"
+        items:
+        - *run
+        - { type: Sequence, nitems: '@output.nfiles' }
+
+    # -1 here means to use the number of CPUs.
+    nproc: 1
+
+    # Output truth catalogs with some of the generated values
+    truth:
+        file_name :
+            type: FormattedStr
+            format: "psfsim-stars-truth-%s-%06d.fits"
+            items:
+                - *run
+                - { type: Sequence, nitems: '@output.nfiles' }
+        columns:
+
+            num: obj_num
+            x: image.image_pos.x
+            y: image.image_pos.y
+
+            flux: psf.flux
+            hlr: "$(@psf).calculateHLR()"
+
