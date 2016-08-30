@@ -6,8 +6,8 @@
 
 some_variables :
     - &run v009
-    - &DESDATA /astro/u/astrodat/data/DES
-    - &PSFSIM_DIR /gpfs/mnt/gpfs01/astro/workarea/esheldon/lensing/des-lensing/psfsim
+    - &DESDATA $os.environ['DESDATA']
+    - &PSFSIM_DIR $os.environ['PSFSIM_DIR']
 
 run: *run
 
