@@ -1,5 +1,4 @@
 # vim: set sw=4 :
-# see notes.txt for a summary of the features
 
 some_variables :
     - &run v010
@@ -206,7 +205,7 @@ gal:
                 type: RandomDistribution
 
                 # number counts of all objects in DES
-                function: x**-0.70
+                function: x**-1.7
 
                 # I got ~370 in this range of fluxes
                 x_min: 6300.0
@@ -231,9 +230,11 @@ image:
     type: Scattered
     xsize: 2048          # DES ccds have 2048 columns
     ysize: 4096          # DES ccds have 4096 rows
+
+    # on average, 370 stars and 1480 galaxies
     nobjects:
         type: RandomPoisson
-        mean: 370
+        mean: 1850
 
     sky_level: 3330.0    # ADU / arcsec^2. 231 in ADU/pixel
 
