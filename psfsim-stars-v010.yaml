@@ -173,7 +173,7 @@ gal:
         # the stars
         - 
             type: Gaussian
-            sigma: 1.e-4
+            half_light_radius: 1.e-4
 
             # we are not setting a gal configuration, so we can set fluxes here
             flux:
