@@ -1,0 +1,307 @@
+# vim: set sw=4 :
+# see notes.txt for a summary of the features
+
+some_variables :
+    - &run v010
+    - &DESDATA $os.environ['DESDATA']
+    - &PSFSIM_DIR $os.environ['PSFSIM_DIR']
+
+run: *run
+
+modules:
+    - galsim.des
+
+    # log normal distribution function
+    - galsim_extra.log_normal
+
+    # generate random integers, excluding some
+    # exports ExcludedRandom
+    - galsim_extra.excluded_random
+
+
+eval_variables:
+    fmean_4: { type: RandomGaussian, sigma: 0.085, index_key: file_num }
+    fspread_4: { type: Random, min: 0.043, max: 0.212, index_key: file_num }
+    fmean_5: { type: RandomGaussian, sigma: 0.062, index_key: file_num }
+    fspread_5: { type: Random, min: 0.018, max: 0.259, index_key: file_num }
+    fmean_6: { type: RandomGaussian, sigma: 0.054, index_key: file_num }
+    fspread_6: { type: Random, min: 0.019, max: 0.165, index_key: file_num }
+    fmean_7: { type: RandomGaussian, sigma: 0.042, index_key: file_num }
+    fspread_7: { type: Random, min: 0.011, max: 0.152, index_key: file_num }
+    fmean_8: { type: RandomGaussian, sigma: 0.044, index_key: file_num }
+    fspread_8: { type: Random, min: 0.011, max: 0.092, index_key: file_num }
+    fmean_9: { type: RandomGaussian, sigma: 0.144, index_key: file_num }
+    fspread_9: { type: Random, min: 0.011, max: 0.236, index_key: file_num }
+    fmean_10: { type: RandomGaussian, sigma: 0.136, index_key: file_num }
+    fspread_10: { type: Random, min: 0.008, max: 0.249, index_key: file_num }
+    fmean_11: { type: RandomGaussian, sigma: 0.073, index_key: file_num }
+    fspread_11: { type: Random, min: 0.015, max: 0.103, index_key: file_num }
+
+
+
+psf:
+    type: Convolve
+
+
+    items:
+    # The atmospheric component
+    -   type: Kolmogorov
+
+        # This means the psf should change per output file, not per object as would be the default.
+        index_key: file_num
+
+        # To avoid PSFs that were "too round", the ellipticity was drawn from a uniform
+        # distribution from sqrt(1.e-4) to sqrt(9.e-4), based on an estimate of the
+        # typical variance of e in ground-based imaging.
+        ellip:
+            type: EBeta
+            e:
+                type: Random
+                min: 0.01
+                max: 0.03
+            beta:
+                type: Random
+
+        # atmosphereic fwhm
+        fwhm:
+            type: LogNormal
+            mean: 0.8
+            sigma: 0.1
+
+    # The optical component
+    -   type: OpticalPSF
+        # Take lambda = 800 nm.  D = 4 m.  lam/D = 0.04 arcsec
+        lam_over_diam: "$800 * 1.e-9 / 4 * 206265"
+
+        # I don't know what the right value of this is.  This is a guess.
+        obscuration: 0.3
+
+        # DECam has 4 struts.  Not sure what strut_thick or strut_angle is appropriate here.
+        # So these are just guesses.
+        nstruts: 4
+        strut_thick: 0.05  # In units of pupil diameter.
+        strut_angle: 10 degrees
+
+
+        # According to Aaron Roodman, for DES the appropriate rms values are
+        # [ 0.13, 0.13, 0.14, 0.06, 0.06, 0.05, 0.06, 0.03 ]
+        # the linear parameter sigma are set to 0.5*(rms mean/4096) and the
+        # quadrataic to 0.5*(rms mean/4096)**2
+
+        defocus: 
+            type: Eval
+            str: "mean_4 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_4/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_4/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_4/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_4/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_4/2048./4096., index_key: file_num }
+
+        astig1: 
+            type: Eval
+            str: "mean_5 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_5/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_5/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_5/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_5/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_5/2048./4096., index_key: file_num }
+
+        astig2: 
+            type: Eval
+            str: "mean_6 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_6/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_6/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_6/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_6/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_6/2048./4096., index_key: file_num }
+
+        coma1: 
+            type: Eval
+            str: "mean_7 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_7/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_7/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_7/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_7/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_7/2048./4096., index_key: file_num }
+
+        coma2: 
+            type: Eval
+            str: "mean_8 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_8/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_8/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_8/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_8/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_8/2048./4096., index_key: file_num }
+
+        trefoil1: 
+            type: Eval
+            str: "mean_9 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_9/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_9/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_9/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_9/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_9/2048./4096., index_key: file_num }
+
+        trefoil2: 
+            type: Eval
+            str: "mean_10 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_10/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_10/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_10/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_10/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_10/2048./4096., index_key: file_num }
+
+        spher: 
+            type: Eval
+            str: "mean_11 + a * image_pos.x + b * image_pos.y + c * image_pos.x**2 + d * image_pos.y**2 + e * image_pos.x*image_pos.y"
+            fa: { type: RandomGaussian, sigma: $spread_11/2048., index_key: file_num }
+            fb: { type: RandomGaussian, sigma: $spread_11/4096., index_key: file_num }
+            fc: { type: RandomGaussian, sigma: $spread_11/2048**2, index_key: file_num }
+            fd: { type: RandomGaussian, sigma: $spread_11/4096**2, index_key: file_num }
+            fe: { type: RandomGaussian, sigma: $spread_11/2048./4096., index_key: file_num }
+
+gal: 
+    # delta function -> stars
+    type: List
+
+    index : 
+        type : Eval
+        # 80% will be real galaxies, 20% stars
+        str : 'int(p<0.2)'
+        fp : { type : Random , min : 0, max : 1 }
+
+    items:
+        # the stars
+        - 
+            type: Gaussian
+            sigma: 1.e-4
+
+            # we are not setting a gal configuration, so we can set fluxes here
+            flux:
+                # this produces way too many bright stars
+
+                type: RandomDistribution
+
+                # looks like the slope for the bright end stars in DES r band
+                function: x**-1.5
+
+                # I got ~370 in this range of fluxes
+                x_min: 6300.0
+                x_max: 1.0e+06
+
+        # the galaxies
+        # no shape noise to better look for biases
+        -
+            type: Exponential
+
+            half_light_radius:
+                type: LogNormal
+                mean: 1.54
+                sigma: 1.0
+
+            # we are not setting a gal configuration, so we can set fluxes here
+            flux:
+                # this produces way too many bright stars
+
+                type: RandomDistribution
+
+                # number counts of all objects in DES
+                function: x**-0.70
+
+                # I got ~370 in this range of fluxes
+                x_min: 6300.0
+                x_max: 1.0e+06
+
+    gsparams:
+        folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
+                                   # that are apparent for the brightest stars.
+        # Some of these objects are a bit large, so allow for larger FFT images.
+        maximum_fft_size: 10000
+
+
+# TODO: need to tune this more for des images
+image:
+    # The "Scattered" type means the objects can be anywhere in the image, even 
+    # overlapping. You can place them at specific locations if you want, but here,
+    # we use the default, which is random locations.
+
+    # parameters from 90 second r-band image
+    # $DESDATA/OPS/red/20140807103234_20131228/red/DECam_00269284/DECam_00269284_42.fits.fz
+
+    type: Scattered
+    xsize: 2048          # DES ccds have 2048 columns
+    ysize: 4096          # DES ccds have 4096 rows
+    nobjects:
+        type: RandomPoisson
+        mean: 370
+
+    sky_level: 3330.0    # ADU / arcsec^2. 231 in ADU/pixel
+
+    # in GalSim land, noise means variance not standard deviation
+    noise:
+        type: CCD        # CCD noise includes both read noise and poisson noise
+        gain: 4.0        # e- / ADU
+        read_noise: 6.8  # Variance in ADU^2 (10.427 sigma in electrons)
+
+    wcs :
+        type : Fits
+        dir:
+            type: FormattedStr
+            format: "%s/OPS/red/20140715085838_20131201/red/DECam_00259397"
+            items:
+                - *DESDATA
+        file_name:
+            type : NumberedFile
+            root : 'DECam_00259397_'
+            digits : 2
+            ext : '.fits.fz'
+            num :
+                # Pick a random chip, but not either of our bad chips.
+                type : ExcludedRandom  # This is a custom type defined in exclude_random.py
+                min: 1
+                max : 62
+                exclude: [ 2, 31, 61 ]
+
+
+    # A specific seed, so results are repeatable. (optional)
+    # over-ride with galsim config.yaml image.random_seed=something
+
+    random_seed: 8969
+
+output:
+    nfiles: 20000
+
+    dir:
+      type: FormattedStr
+      format: "%s/%s/output"
+      items:
+        - *PSFSIM_DIR
+        - *run
+
+    file_name:
+        type: FormattedStr
+        format: "psfsim-stars-%s-%06d.fits"
+        items:
+        - *run
+        - { type: Sequence, nitems: '@output.nfiles' }
+
+    # -1 here means to use the number of CPUs.
+    nproc: 1
+
+    # Output truth catalogs with some of the generated values
+    truth:
+        file_name :
+            type: FormattedStr
+            format: "psfsim-stars-truth-%s-%06d.fits"
+            items:
+                - *run
+                - { type: Sequence, nitems: '@output.nfiles' }
+        columns:
+
+            num: obj_num
+            x: image.image_pos.x
+            y: image.image_pos.y
+
+            flux: psf.flux
+            hlr: "$(@psf).calculateHLR()"
+
