@@ -303,6 +303,8 @@ output:
             x: image.image_pos.x
             y: image.image_pos.y
 
-            flux: psf.flux
-            hlr: "$(@psf).calculateHLR()"
+            flux: gal.flux
+            hlr:  gal.half_light_radius
+
+            psf_hlr: "$(@psf).calculateHLR()"
 
