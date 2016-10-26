@@ -163,31 +163,13 @@ gal:
     # delta function -> stars
     type: List
 
-    index : 
+    index: 
         type : Eval
         # 80% will be real galaxies, 20% stars
         str : 'int(p<0.2)'
         fp : { type : Random , min : 0, max : 1 }
 
     items:
-        # the stars
-        - 
-            type: Gaussian
-            half_light_radius: 1.e-4
-
-            # we are not setting a gal configuration, so we can set fluxes here
-            flux:
-                # this produces way too many bright stars
-
-                type: RandomDistribution
-
-                # looks like the slope for the bright end stars in DES r band
-                function: x**-1.5
-
-                # I got ~370 in this range of fluxes
-                x_min: 6300.0
-                x_max: 1.0e+06
-
         # the galaxies
         # no shape noise to better look for biases
         -
@@ -207,10 +189,27 @@ gal:
                 # number counts of all objects in DES
                 function: x**-1.7
 
-                #x_min: 6300.0
-                #x_max: 1.0e+06
-                x_min: 1.0e+05
-                x_max: 4.0e+05
+                x_min: 6300.0
+                x_max: 1.0e+06
+
+        # the stars
+        - 
+            type: Gaussian
+            half_light_radius: 1.e-4
+
+            # we are not setting a gal configuration, so we can set fluxes here
+            flux:
+                # this produces way too many bright stars
+
+                type: RandomDistribution
+
+                # looks like the slope for the bright end stars in DES r band
+                function: x**-1.5
+
+                # I got ~370 in this range of fluxes
+                x_min: 6300.0
+                x_max: 1.0e+06
+
 
     gsparams:
         folding_threshold: 1.e-3  # Build PSFs a bit larger to avoid artifacts
@@ -232,7 +231,7 @@ image:
     xsize: 2048          # DES ccds have 2048 columns
     ysize: 4096          # DES ccds have 4096 rows
 
-    # on average, 370 stars and 1480 galaxies
+    # on average, 370 stars and rest galaxies
     nobjects:
         type: RandomPoisson
         mean: 1850
