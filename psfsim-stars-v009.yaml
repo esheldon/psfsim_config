@@ -1,9 +1,6 @@
 # vim: set sw=4 :
 # see notes.txt for a summary of the features
 
-# TODO - send pull request so galsim can get DESDATA PSFSIM_DIR from
-# environment variables
-
 some_variables :
     - &run v009
     - &DESDATA $os.environ['DESDATA']
@@ -188,7 +185,6 @@ gal:
         maximum_fft_size: 10000
 
 
-# TODO: need to tune this more for des images
 image:
     # The "Scattered" type means the objects can be anywhere in the image, even 
     # overlapping. You can place them at specific locations if you want, but here,
